@@ -51,7 +51,7 @@ public final class Material {
                     final var resultSet = statement.executeQuery();) {
                 final var compositions = new HashMap<Material, Float>();
                 while (resultSet.next()) {
-                    final var code = resultSet.getInt("c.product_code");
+                    final var code = resultSet.getInt("m.code");
                     final var composition = resultSet.getFloat("c.percent");
                     final var material = new Material(code, resultSet.getString("m.description"));
                     compositions.put(material, composition);

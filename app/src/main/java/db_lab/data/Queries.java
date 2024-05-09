@@ -17,7 +17,7 @@ public final class Queries {
 
     public static final String PRODUCT_COMPOSITION =
         """
-        SELECT c.product_code m.description, c.percent
+        SELECT m.code, m.description, c.percent
         FROM COMPOSITION c, MATERIAL m
         WHERE c.material_code = m.code
         AND c.product_code = ?
@@ -26,7 +26,7 @@ public final class Queries {
     public static final String FIND_PRODUCT =
         """
         SELECT p.code, p.name, p.description
-        FROM PRODUCT p, 
+        FROM PRODUCT p
         WHERE p.code = ?
         """;
 }

@@ -10,7 +10,6 @@ import db_lab.data.Material;
 import db_lab.data.Product;
 import db_lab.data.ProductPreview;
 import db_lab.data.Tag;
-import db_lab.model.Model;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Savepoint;
