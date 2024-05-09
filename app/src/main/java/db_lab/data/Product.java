@@ -15,7 +15,7 @@ public final class Product {
     public final String description;
     public final Map<Material, Float> composition;
 
-    public Product(int code, String name, String description, Map<Material, Float> composition) {
+    public Product(final int code, final String name, final String description, final Map<Material, Float> composition) {
         this.code = code;
         this.name = name;
         this.description = description == null ? "" : description;
@@ -23,13 +23,13 @@ public final class Product {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (other == this) {
             return true;
         } else if (other == null) {
             return false;
         } else if (other instanceof Product) {
-            var p = (Product) other;
+            final var p = (Product) other;
             return (
                 p.code == this.code &&
                 p.name.equals(this.name) &&
@@ -61,8 +61,21 @@ public final class Product {
 
     public final class DAO {
 
-        public static Optional<Product> find(Connection connection, int productId) {
-            throw new UnsupportedOperationException("Unimplemented");
+        public static Optional<Product> find(final Connection connection, final int productId) {
+            Optional<Product> temp = Optional.empty();
+            try (final var statement = DAOUtils.prepare(connection, Queries.FIND_PRODUCT, productId);
+                    final var resultSet = statement.executeQuery();) {
+                while (resultSet.next()) {
+                    final var code = resultSet.getInt("p.code");
+                    final var name = resultSet.getString("p.name");
+                    final var description = resultSet.getString("p.description");
+                    final var composition = Material.DAO.forProduct(connection, productId);
+                    temp = Optional.of(new Product(code, name, description, composition));  
+                }
+                return temp;
+            } catch (final Exception e) {
+                throw new DAOException(e);
+            }
         }
     }
 }

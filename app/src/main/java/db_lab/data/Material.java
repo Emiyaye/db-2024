@@ -11,19 +11,19 @@ public final class Material {
     public final int code;
     public final String description;
 
-    public Material(int code, String description) {
+    public Material(final int code, final String description) {
         this.code = code;
         this.description = description == null ? "" : description;
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (other == this) {
             return true;
         } else if (other == null) {
             return false;
         } else if (other instanceof Material) {
-            var m = (Material) other;
+            final var m = (Material) other;
             return (m.code == this.code && m.description.equals(this.description));
         } else {
             return false;
@@ -38,17 +38,28 @@ public final class Material {
     @Override
     public String toString() {
         return Printer.stringify(
-            "Material",
-            List.of(Printer.field("code", this.code), Printer.field("description", this.description))
-        );
+                "Material",
+                List.of(Printer.field("code", this.code), Printer.field("description", this.description)));
     }
 
     public final class DAO {
 
-        public static Map<Material, Float> forProduct(Connection connection, int productId) {
+        public static Map<Material, Float> forProduct(final Connection connection, final int productId) {
             // Iterating through a resultSet:
             // https://docs.oracle.com/javase/tutorial/jdbc/basics/retrieving.html
-            throw new UnsupportedOperationException("Unimplemented");
+            try (final var statement = DAOUtils.prepare(connection, Queries.PRODUCT_COMPOSITION, productId);
+                    final var resultSet = statement.executeQuery();) {
+                final var compositions = new HashMap<Material, Float>();
+                while (resultSet.next()) {
+                    final var code = resultSet.getInt("c.product_code");
+                    final var composition = resultSet.getFloat("c.percent");
+                    final var material = new Material(code, resultSet.getString("m.description"));
+                    compositions.put(material, composition);
+                }
+                return compositions;
+            } catch (final Exception e) {
+                throw new DAOException(e);
+            }
         }
     }
 }
